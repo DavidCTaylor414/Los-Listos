@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+
+const WARMUP_HINT_DELAY = 5000  // show "warming up" hint after 5s
+const REQUEST_TIMEOUT   = 25000 // abort and prompt retry after 25s
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -9,28 +12,51 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showWarmup, setShowWarmup] = useState(false)
+  const warmupTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => { if (warmupTimer.current) clearTimeout(warmupTimer.current) }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setShowWarmup(false)
+
+    warmupTimer.current = setTimeout(() => setShowWarmup(true), WARMUP_HINT_DELAY)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal,
       })
+      clearTimeout(timeout)
       const data = await res.json()
       if (!res.ok) {
         setError(data.error ?? 'Login failed. Please try again.')
-        setLoading(false)
       } else {
         router.push('/admin')
+        return
       }
-    } catch {
-      setError('Connection error. Please try again.')
-      setLoading(false)
+    } catch (err) {
+      clearTimeout(timeout)
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('The server is starting up — please try signing in again. It usually works on the second attempt.')
+      } else {
+        setError('Connection error. Please try again.')
+      }
     }
+
+    if (warmupTimer.current) clearTimeout(warmupTimer.current)
+    setShowWarmup(false)
+    setLoading(false)
   }
 
   return (
@@ -71,13 +97,27 @@ export default function AdminLoginPage() {
               suppressHydrationWarning
             />
           </div>
-          {error && <p className="text-[#ef4444] text-sm">{error}</p>}
+
+          {error && (
+            <p className="text-[#ef4444] text-sm">{error}</p>
+          )}
+
+          {showWarmup && !error && (
+            <div className="flex items-center gap-2 text-gray-500 text-xs">
+              <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+              Server is warming up — this may take a moment…
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:opacity-50 text-white font-semibold py-3 rounded-lg text-sm transition-colors"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
       </div>
