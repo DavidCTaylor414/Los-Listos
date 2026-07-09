@@ -36,7 +36,9 @@ export default function PropiedadesPage() {
     if (bathroomFilter !== 'Todos') params.set('minBathrooms', bathroomFilter.replace('+', ''))
 
     const res = await fetch(`/api/properties?${params}`)
+    if (!res.ok) { setProperties([]); setLoading(false); return }
     const data: Property[] = await res.json()
+    if (!Array.isArray(data)) { setProperties([]); setLoading(false); return }
 
     if (sortBy === 'price-asc') data.sort((a, b) => a.price - b.price)
     else if (sortBy === 'price-desc') data.sort((a, b) => b.price - a.price)
