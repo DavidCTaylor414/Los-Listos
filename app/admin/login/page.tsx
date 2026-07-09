@@ -27,35 +27,46 @@ export default function AdminLoginPage() {
 
     warmupTimer.current = setTimeout(() => setShowWarmup(true), WARMUP_HINT_DELAY)
 
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
+    type Result =
+      | { type: 'ok';      res: Response }
+      | { type: 'timeout' }
+      | { type: 'error';   err: unknown }
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        signal: controller.signal,
-      })
-      clearTimeout(timeout)
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error ?? 'Login failed. Please try again.')
-      } else {
-        router.push('/admin')
-        return
-      }
-    } catch (err) {
-      clearTimeout(timeout)
-      if (err instanceof Error && err.name === 'AbortError') {
-        setError('The server is starting up — please try signing in again. It usually works on the second attempt.')
-      } else {
-        setError('Connection error. Please try again.')
-      }
-    }
+    const fetchRace: Promise<Result> = fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((res) => ({ type: 'ok' as const, res }))
+      .catch((err) => ({ type: 'error' as const, err }))
+
+    const timeoutRace: Promise<Result> = new Promise((resolve) =>
+      setTimeout(() => resolve({ type: 'timeout' }), REQUEST_TIMEOUT)
+    )
+
+    const result = await Promise.race([fetchRace, timeoutRace])
 
     if (warmupTimer.current) clearTimeout(warmupTimer.current)
     setShowWarmup(false)
+
+    if (result.type === 'timeout') {
+      setError('The server is starting up — please try signing in again. It usually works on the second attempt.')
+    } else if (result.type === 'error') {
+      setError('Connection error. Please try again.')
+    } else {
+      try {
+        const data = await result.res.json()
+        if (!result.res.ok) {
+          setError(data.error ?? 'Login failed. Please try again.')
+        } else {
+          router.push('/admin')
+          return
+        }
+      } catch {
+        setError('Unexpected response. Please try again.')
+      }
+    }
+
     setLoading(false)
   }
 
