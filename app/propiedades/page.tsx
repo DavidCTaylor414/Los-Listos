@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { properties } from '@/lib/data'
+import { useState, useEffect, useCallback } from 'react'
+import { Property } from '@/lib/data'
 import PropertyCard from '@/components/PropertyCard'
 
 const TYPES = ['Todos', 'Casa', 'Condominio', 'Townhouse', 'Multi-Familiar'] as const
 const STATUSES = ['Todos', 'En Venta', 'Bajo Contrato', 'Vendido'] as const
-const CITIES = ['Todas', ...Array.from(new Set(properties.map((p) => p.city)))]
+const CITIES = ['Todas', 'San Antonio', 'Houston', 'Dallas', 'Austin', 'El Paso', 'Fort Worth', 'Plano']
 const BEDROOMS = ['Todos', '2+', '3+', '4+', '5+'] as const
 const BATHROOMS = ['Todos', '1+', '2+', '3+'] as const
 
@@ -20,27 +20,33 @@ export default function PropiedadesPage() {
   const [bedroomFilter, setBedroomFilter] = useState('Todos')
   const [bathroomFilter, setBathroomFilter] = useState('Todos')
   const [sortBy, setSortBy] = useState('newest')
+  const [properties, setProperties] = useState<Property[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filtered = useMemo(() => {
-    let list = [...properties]
-    if (typeFilter !== 'Todos') list = list.filter((p) => p.type === typeFilter)
-    if (statusFilter !== 'Todos') list = list.filter((p) => p.status === statusFilter)
-    if (cityFilter !== 'Todas') list = list.filter((p) => p.city === cityFilter)
-    list = list.filter((p) => p.price <= maxPrice)
-    list = list.filter((p) => p.sqft >= minSqft && p.sqft <= maxSqft)
-    if (bedroomFilter !== 'Todos') {
-      const min = parseInt(bedroomFilter)
-      list = list.filter((p) => p.bedrooms >= min)
-    }
-    if (bathroomFilter !== 'Todos') {
-      const min = parseFloat(bathroomFilter)
-      list = list.filter((p) => p.bathrooms >= min)
-    }
-    if (sortBy === 'price-asc') list.sort((a, b) => a.price - b.price)
-    else if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price)
-    else list.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime())
-    return list
+  const fetchProperties = useCallback(async () => {
+    setLoading(true)
+    const params = new URLSearchParams()
+    if (typeFilter !== 'Todos') params.set('type', typeFilter)
+    if (statusFilter !== 'Todos') params.set('status', statusFilter)
+    if (cityFilter !== 'Todas') params.set('city', cityFilter)
+    params.set('maxPrice', String(maxPrice))
+    if (minSqft > 0) params.set('minSqft', String(minSqft))
+    if (maxSqft < 6000) params.set('maxSqft', String(maxSqft))
+    if (bedroomFilter !== 'Todos') params.set('minBedrooms', bedroomFilter.replace('+', ''))
+    if (bathroomFilter !== 'Todos') params.set('minBathrooms', bathroomFilter.replace('+', ''))
+
+    const res = await fetch(`/api/properties?${params}`)
+    const data: Property[] = await res.json()
+
+    if (sortBy === 'price-asc') data.sort((a, b) => a.price - b.price)
+    else if (sortBy === 'price-desc') data.sort((a, b) => b.price - a.price)
+    else data.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime())
+
+    setProperties(data)
+    setLoading(false)
   }, [typeFilter, statusFilter, cityFilter, maxPrice, minSqft, maxSqft, bedroomFilter, bathroomFilter, sortBy])
+
+  useEffect(() => { fetchProperties() }, [fetchProperties])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -223,7 +229,11 @@ export default function PropiedadesPage() {
           {/* Sort bar */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-400 text-sm">
-              <span className="text-white font-semibold">{filtered.length}</span> propiedad{filtered.length !== 1 ? 'es' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
+              {loading ? (
+                <span className="text-gray-500">Buscando...</span>
+              ) : (
+                <><span className="text-white font-semibold">{properties.length}</span> propiedad{properties.length !== 1 ? 'es' : ''} encontrada{properties.length !== 1 ? 's' : ''}</>
+              )}
             </p>
             <select
               value={sortBy}
@@ -236,7 +246,20 @@ export default function PropiedadesPage() {
             </select>
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-[#111827] border border-[#374151] rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-52 bg-[#1f2937]" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-[#1f2937] rounded w-1/2" />
+                    <div className="h-5 bg-[#1f2937] rounded w-3/4" />
+                    <div className="h-4 bg-[#1f2937] rounded w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : properties.length === 0 ? (
             <div className="text-center py-20 text-gray-500">
               <svg className="w-12 h-12 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -245,7 +268,7 @@ export default function PropiedadesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filtered.map((property) => (
+              {properties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>

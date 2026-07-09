@@ -1,11 +1,10 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getPropertyById, properties, formatPrice } from '@/lib/data'
+import { formatPrice, Property } from '@/lib/data'
+import { getDb } from '@/lib/mongodb'
 
-export function generateStaticParams() {
-  return properties.map((p) => ({ id: p.id }))
-}
+export const dynamic = 'force-dynamic'
 
 const statusColor: Record<string, string> = {
   'En Venta': 'bg-[#16a34a] text-white',
@@ -15,7 +14,8 @@ const statusColor: Record<string, string> = {
 
 export default async function PropertyDetailPage(props: PageProps<'/propiedades/[id]'>) {
   const { id } = await props.params
-  const property = getPropertyById(id)
+  const db = await getDb()
+  const property = await db.collection('properties').findOne({ id }, { projection: { _id: 0 } }) as Property | null
   if (!property) notFound()
 
   return (
