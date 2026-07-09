@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const WARMUP_HINT_DELAY = 5000  // show "warming up" hint after 5s
-const REQUEST_TIMEOUT   = 25000 // abort and prompt retry after 25s
+const REQUEST_TIMEOUT   = 15000 // abort and prompt retry after 15s
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
-              Server is warming up — this may take a moment…
+              Server is warming up — you&apos;ll be prompted to retry shortly…
             </div>
           )}
 
