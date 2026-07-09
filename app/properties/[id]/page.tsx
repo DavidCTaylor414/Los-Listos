@@ -7,24 +7,24 @@ import { getDb } from '@/lib/mongodb'
 export const dynamic = 'force-dynamic'
 
 const statusColor: Record<string, string> = {
-  'En Venta': 'bg-[#16a34a] text-white',
-  'Bajo Contrato': 'bg-[#dc2626] text-white',
-  'Vendido': 'bg-gray-600 text-white',
+  'For Sale': 'bg-[#16a34a] text-white',
+  'Under Contract': 'bg-[#dc2626] text-white',
+  'Sold': 'bg-gray-600 text-white',
 }
 
-export default async function PropertyDetailPage(props: PageProps<'/propiedades/[id]'>) {
+export default async function PropertyDetailPage(props: PageProps<'/properties/[id]'>) {
   const { id } = await props.params
   const db = await getDb()
   const property = await db.collection('properties').findOne({ id }, { projection: { _id: 0 } }) as Property | null
   if (!property) notFound()
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <Link href="/" className="hover:text-[#22c55e] transition-colors">Inicio</Link>
+        <Link href="/" className="hover:text-[#22c55e] transition-colors">Home</Link>
         <span>/</span>
-        <Link href="/propiedades" className="hover:text-[#22c55e] transition-colors">Propiedades</Link>
+        <Link href="/properties" className="hover:text-[#22c55e] transition-colors">Properties</Link>
         <span>/</span>
         <span className="text-gray-300">{property.address}</span>
       </nav>
@@ -36,7 +36,7 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
           <div className="relative rounded-xl overflow-hidden h-72 sm:h-96 bg-[#1f2937]">
             <Image
               src={property.images[0]}
-              alt={property.titleEs}
+              alt={property.title}
               fill
               className="object-cover"
               priority
@@ -57,7 +57,7 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
             <div className="grid grid-cols-4 gap-2">
               {property.images.map((img, i) => (
                 <div key={i} className="relative rounded-lg overflow-hidden h-20 bg-[#1f2937]">
-                  <Image src={img} alt={`Foto ${i + 1}`} fill className="object-cover" sizes="20vw" />
+                  <Image src={img} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="20vw" />
                 </div>
               ))}
             </div>
@@ -65,7 +65,7 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
 
           {/* Title + price */}
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">{property.titleEs}</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-white">{property.title}</h1>
             <p className="text-gray-400 mt-1">{property.address}, {property.city}, {property.state} {property.zip}</p>
             <p className="text-[#22c55e] font-black text-4xl mt-3">{formatPrice(property.price)}</p>
           </div>
@@ -73,10 +73,10 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
           {/* Stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: 'Recámaras', value: property.bedrooms, icon: '🛏️' },
-              { label: 'Baños', value: property.bathrooms, icon: '🚿' },
-              { label: 'Superficie', value: `${property.sqft.toLocaleString()} ft²`, icon: '📐' },
-              { label: 'Año', value: property.yearBuilt, icon: '🏗️' },
+              { label: 'Bedrooms', value: property.bedrooms, icon: '🛏️' },
+              { label: 'Bathrooms', value: property.bathrooms, icon: '🚿' },
+              { label: 'Square Footage', value: `${property.sqft.toLocaleString()} ft²`, icon: '📐' },
+              { label: 'Year Built', value: property.yearBuilt, icon: '🏗️' },
             ].map((s) => (
               <div key={s.label} className="bg-[#111827] border border-[#374151] rounded-xl p-4 text-center">
                 <p className="text-2xl mb-1">{s.icon}</p>
@@ -88,14 +88,13 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
 
           {/* Description */}
           <div className="bg-[#111827] border border-[#374151] rounded-xl p-6">
-            <h2 className="text-white font-bold text-lg mb-3">Descripción</h2>
-            <p className="text-gray-300 leading-relaxed">{property.descriptionEs}</p>
-            <p className="text-gray-500 text-sm mt-3 italic">{property.description}</p>
+            <h2 className="text-white font-bold text-lg mb-3">Description</h2>
+            <p className="text-gray-300 leading-relaxed">{property.description}</p>
           </div>
 
           {/* Features */}
           <div className="bg-[#111827] border border-[#374151] rounded-xl p-6">
-            <h2 className="text-white font-bold text-lg mb-4">Características</h2>
+            <h2 className="text-white font-bold text-lg mb-4">Features</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {property.features.map((f) => (
                 <div key={f} className="flex items-center gap-3">
@@ -119,7 +118,7 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
               </div>
               <div>
                 <p className="text-white font-bold">{property.agent.name}</p>
-                <p className="text-[#22c55e] text-sm">Agente Los Listos</p>
+                <p className="text-[#22c55e] text-sm">Los Listos Agent</p>
               </div>
             </div>
 
@@ -145,34 +144,34 @@ export default async function PropertyDetailPage(props: PageProps<'/propiedades/
             </div>
 
             <Link
-              href={`/contacto?propiedad=${encodeURIComponent(property.titleEs)}`}
+              href={`/contact?property=${encodeURIComponent(property.title)}`}
               className="block w-full bg-[#16a34a] hover:bg-[#15803d] text-white font-semibold py-3 rounded-lg text-center transition-colors text-sm"
             >
-              Solicitar Información
+              Request Information
             </Link>
             <Link
-              href="/propiedades"
+              href="/properties"
               className="block w-full mt-2 border border-[#374151] hover:border-[#16a34a] text-gray-400 hover:text-white font-medium py-3 rounded-lg text-center transition-colors text-sm"
             >
-              ← Volver a Propiedades
+              ← Back to Properties
             </Link>
 
             {/* Details summary */}
             <div className="mt-6 pt-5 border-t border-[#374151] space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Vecindario</span>
+                <span className="text-gray-500">Neighborhood</span>
                 <span className="text-gray-300">{property.neighborhood}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Ciudad</span>
+                <span className="text-gray-500">City</span>
                 <span className="text-gray-300">{property.city}, {property.state}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Publicado</span>
-                <span className="text-gray-300">{new Date(property.listedDate).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <span className="text-gray-500">Listed</span>
+                <span className="text-gray-300">{new Date(property.listedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Año construido</span>
+                <span className="text-gray-500">Year Built</span>
                 <span className="text-gray-300">{property.yearBuilt}</span>
               </div>
             </div>

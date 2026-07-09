@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function Footer() {
   return (
     <footer className="bg-[#111827] border-t border-[#374151] mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div>
@@ -14,26 +14,23 @@ export default function Footer() {
               <span className="text-gray-400 text-xs font-medium uppercase tracking-widest ml-1">Realty</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Tu agencia de confianza para comprar y vender propiedades en Texas. Hablamos tu idioma.
-            </p>
-            <p className="text-gray-500 text-xs mt-3">
-              Your trusted Texas real estate partner.
+              Your trusted real estate agency for buying and selling properties across Texas.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Navegación</h3>
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Navigation</h3>
             <ul className="space-y-2">
-              <li><Link href="/" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Inicio</Link></li>
-              <li><Link href="/propiedades" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Propiedades</Link></li>
-              <li><Link href="/contacto" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Contacto</Link></li>
+              <li><Link href="/" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Home</Link></li>
+              <li><Link href="/properties" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Properties</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-[#22c55e] text-sm transition-colors">Contact</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Contacto</h3>
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Contact</h3>
             <ul className="space-y-2 text-sm text-gray-400">
               <li className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#16a34a] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +56,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-[#374151] mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-gray-500 text-xs">© 2026 Los Listos Realty. Todos los derechos reservados.</p>
+          <p className="text-gray-500 text-xs">© 2026 Los Listos Realty. All rights reserved.</p>
           <div className="flex items-center gap-1">
             <div className="w-4 h-3 bg-[#dc2626] rounded-sm"></div>
             <div className="w-4 h-3 bg-white rounded-sm"></div>
