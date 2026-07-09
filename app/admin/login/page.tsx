@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 
 const WARMUP_HINT_DELAY = 5000  // show "warming up" hint after 5s
 const REQUEST_TIMEOUT   = 15000 // abort and prompt retry after 15s
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -59,7 +57,7 @@ export default function AdminLoginPage() {
         if (!result.res.ok) {
           setError(data.error ?? 'Login failed. Please try again.')
         } else {
-          router.push('/admin')
+          window.location.href = '/admin'
           return
         }
       } catch {
