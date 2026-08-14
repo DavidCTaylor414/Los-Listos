@@ -31,7 +31,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
               <Link
-                href="/propiedades"
+                href="/properties"
                 className="bg-[#16a34a] hover:bg-[#15803d] text-white font-semibold px-8 py-3.5 rounded-lg text-base transition-colors text-center"
               >
                 View Available Properties
@@ -76,7 +76,7 @@ export default function HomePage() {
             <p className="text-[#22c55e] text-sm font-semibold uppercase tracking-widest mb-1">Available Now</p>
             <h2 className="text-3xl font-black text-white">Featured Properties</h2>
           </div>
-          <Link href="/propiedades" className="text-[#22c55e] hover:text-white text-sm font-medium transition-colors hidden sm:block">
+          <Link href="/properties" className="text-[#22c55e] hover:text-white text-sm font-medium transition-colors hidden sm:block">
             View all →
           </Link>
         </div>
@@ -88,7 +88,7 @@ export default function HomePage() {
         </div>
 
         <div className="mt-8 sm:hidden text-center">
-          <Link href="/propiedades" className="text-[#22c55e] hover:text-white text-sm font-medium transition-colors">
+          <Link href="/properties" className="text-[#22c55e] hover:text-white text-sm font-medium transition-colors">
             View all properties →
           </Link>
         </div>
@@ -158,7 +158,7 @@ export default function HomePage() {
             Our agents are ready to help you. Call us or send us a message today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/propiedades" className="bg-[#16a34a] hover:bg-[#15803d] text-white font-semibold px-8 py-3.5 rounded-lg transition-colors">
+            <Link href="/properties" className="bg-[#16a34a] hover:bg-[#15803d] text-white font-semibold px-8 py-3.5 rounded-lg transition-colors">
               Search Properties
             </Link>
             <Link href="/contact" className="bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold px-8 py-3.5 rounded-lg transition-colors">

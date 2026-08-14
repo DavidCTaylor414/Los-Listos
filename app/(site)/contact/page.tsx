@@ -17,14 +17,34 @@ function ContactForm() {
     service: 'buy',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSubmitted(true)
+    setSubmitting(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Failed to send message')
+      }
+      setSubmitted(true)
+    } catch {
+      setError('Something went wrong sending your message. Please try again or call us directly.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (submitted) {
@@ -133,11 +153,14 @@ function ContactForm() {
         />
       </div>
 
+      {error && <p className="text-[#ef4444] text-sm">{error}</p>}
+
       <button
         type="submit"
-        className="w-full bg-[#16a34a] hover:bg-[#15803d] text-white font-semibold py-3.5 rounded-lg text-sm transition-colors"
+        disabled={submitting}
+        className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:opacity-50 text-white font-semibold py-3.5 rounded-lg text-sm transition-colors"
       >
-        Send Message
+        {submitting ? 'Sending…' : 'Send Message'}
       </button>
 
       <p className="text-gray-600 text-xs text-center">
@@ -149,19 +172,20 @@ function ContactForm() {
 
 export default function ContactPage() {
   return (
-    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="text-[#22c55e] text-sm font-semibold uppercase tracking-widest mb-2">We are here for you</p>
-        <h1 className="text-3xl sm:text-4xl font-black text-white">Contact Us</h1>
-        <p className="text-gray-400 mt-3 max-w-xl mx-auto">
-          Ready to take the next step? Our agents are ready to help you find your perfect property.
-        </p>
-      </div>
+    <div className="bg-[#d1d5db] min-h-full">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <p className="text-[#16a34a] text-sm font-semibold uppercase tracking-widest mb-2">We are here for you</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900">Contact Us</h1>
+          <p className="text-gray-600 mt-3 max-w-xl mx-auto">
+            Ready to take the next step? Our agents are ready to help you find your perfect property.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Contact info */}
-        <div className="space-y-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start lg:items-stretch">
+          {/* Contact info */}
+          <div className="flex flex-col gap-5 lg:justify-between">
           <div className="bg-[#111827] border border-[#374151] rounded-xl p-6">
             <h2 className="text-white font-bold mb-5">Contact Information</h2>
             <div className="space-y-4">
@@ -215,7 +239,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="bg-[#dc2626]/10 border border-[#dc2626]/30 rounded-xl p-5">
+          <div className="bg-[#111827] border border-[#374151] rounded-xl p-5">
             <p className="text-[#ef4444] font-semibold text-sm mb-1">Urgent?</p>
             <p className="text-gray-400 text-sm">Call us directly at <span className="text-white font-medium">(210) 555-0100</span> — available 7 days a week.</p>
           </div>
@@ -228,6 +252,7 @@ export default function ContactPage() {
             <ContactForm />
           </Suspense>
         </div>
+      </div>
       </div>
     </div>
   )
