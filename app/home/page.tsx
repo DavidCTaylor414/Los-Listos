@@ -43,32 +43,6 @@ const BADGES = [
   },
 ]
 
-const FIREWORKS = [
-  { top: '10%', left: '15%', size: 60, color: '#f472b6', delay: '0s' },
-  { top: '20%', left: '70%', size: 80, color: '#facc15', delay: '0.3s' },
-  { top: '55%', left: '10%', size: 70, color: '#60a5fa', delay: '0.6s' },
-  { top: '65%', left: '85%', size: 90, color: '#4ade80', delay: '0.2s' },
-  { top: '35%', left: '45%', size: 50, color: '#f87171', delay: '0.9s' },
-  { top: '80%', left: '30%', size: 65, color: '#c084fc', delay: '0.5s' },
-  { top: '15%', left: '90%', size: 55, color: '#fb923c', delay: '1.1s' },
-  { top: '45%', left: '5%', size: 75, color: '#22d3ee', delay: '0.8s' },
-  { top: '85%', left: '60%', size: 60, color: '#facc15', delay: '1.3s' },
-  { top: '5%', left: '40%', size: 70, color: '#f472b6', delay: '0.4s' },
-]
-
-const FLOATING_EMOJI = [
-  { char: '🐱', top: '10%', left: '20%', delay: '0s' },
-  { char: '🌈', top: '68%', left: '12%', delay: '0.4s' },
-  { char: '🐱', top: '25%', left: '78%', delay: '0.2s' },
-  { char: '🌈', top: '55%', left: '62%', delay: '0.6s' },
-  { char: '🐱', top: '78%', left: '42%', delay: '0.3s' },
-  { char: '🌈', top: '18%', left: '52%', delay: '0.8s' },
-  { char: '🐱', top: '48%', left: '8%', delay: '0.5s' },
-  { char: '🌈', top: '38%', left: '88%', delay: '0.1s' },
-  { char: '🐱', top: '85%', left: '75%', delay: '0.7s' },
-  { char: '🌈', top: '5%', left: '85%', delay: '0.9s' },
-]
-
 const SERVICES = [
   { title: 'Sell your home', description: 'Get a free valuation and list with a trusted local agent.', cta: 'Speak with an agent' },
   { title: 'Homes in your area', description: 'Browse available listings near you.', cta: 'Browse listings' },
@@ -82,7 +56,6 @@ export default function HomePage() {
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
   const [openService, setOpenService] = useState<number | null>(null)
-  const [partyMode, setPartyMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const featured = properties.filter((p) => p.status === 'For Sale').slice(0, 9)
 
@@ -147,19 +120,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#d1d5db]">
       <header className="relative bg-[#111827] border-b border-black px-6 py-4 sm:px-10 sm:py-5 flex items-center">
-        <button
-          type="button"
-          onClick={() => setPartyMode(true)}
-          tabIndex={-1}
-          className="absolute top-0 right-0 w-14 h-full"
-        />
         <span className="flex items-center gap-1">
           <span className="text-[#16a34a] font-black text-2xl tracking-tight">LOS</span>
           <span className="text-white font-black text-2xl tracking-tight">LISTOS</span>
           <span className="text-[#dc2626] font-black text-2xl tracking-tight">•</span>
         </span>
 
-        <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-md h-8 flex items-center justify-center overflow-hidden text-center px-4">
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-full max-w-md h-8 items-center justify-center overflow-hidden text-center px-4">
           <p
             className={`text-base sm:text-lg font-bold text-white leading-tight transition-all duration-[400ms] ${
               visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
@@ -327,46 +294,6 @@ export default function HomePage() {
       <div className="-mt-20">
         <Footer />
       </div>
-
-      {partyMode && (
-        <div
-          onClick={() => setPartyMode(false)}
-          className="fixed inset-0 z-[100] bg-black overflow-hidden cursor-pointer"
-        >
-          {FIREWORKS.map((fw, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full animate-ping"
-              style={{
-                top: fw.top,
-                left: fw.left,
-                width: fw.size,
-                height: fw.size,
-                backgroundColor: fw.color,
-                animationDelay: fw.delay,
-                animationDuration: '1.6s',
-              }}
-            />
-          ))}
-
-          {FLOATING_EMOJI.map((e, i) => (
-            <span
-              key={i}
-              className="absolute text-5xl sm:text-6xl select-none animate-bounce"
-              style={{ top: e.top, left: e.left, animationDelay: e.delay }}
-            >
-              {e.char}
-            </span>
-          ))}
-
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
-            <p className="text-5xl sm:text-7xl font-black text-yellow-300 animate-pulse text-center drop-shadow-[0_0_25px_rgba(250,204,21,0.9)]">
-              WASSUP TERRA!
-            </p>
-            <p className="mt-8 text-gray-400 text-sm">(tap anywhere to close)</p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
