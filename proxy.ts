@@ -7,10 +7,15 @@ export function proxy(request: NextRequest) {
   if (
     pathname === '/home' ||
     pathname === '/contact' ||
+    pathname === '/va-loan-application' ||
+    pathname === '/first-time-buyer-application' ||
+    pathname === '/loan-refinancing-application' ||
+    pathname === '/testimonials' ||
     pathname === '/admin/login' ||
     pathname === '/api/contact' ||
     pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/api/images/')
+    pathname.startsWith('/api/images/') ||
+    /\.(png|jpe?g|gif|webp|avif|svg|ico)$/.test(pathname)
   ) {
     return NextResponse.next()
   }
