@@ -83,8 +83,8 @@ export default function HomePage() {
               }}
               className="w-[85%] mx-auto lg:w-full lg:max-w-sm lg:mx-0 bg-[#111827] border border-[#374151] rounded-xl p-6 sm:p-8 shadow-sm"
             >
-              <h2 className="text-white font-bold text-lg mb-1">Get Pre-Qualified</h2>
-              <p className="text-gray-300 text-sm mb-6">No personal information required!</p>
+              <h2 className="text-white font-bold text-xl text-center mb-1">Get Pre-Qualified</h2>
+              <p className="text-gray-300 text-sm text-center mb-6">No personal information required*</p>
 
               <div className="space-y-4">
                 <div>
